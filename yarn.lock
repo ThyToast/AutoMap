@@ -1803,6 +1803,11 @@
   dependencies:
     "@types/istanbul-lib-report" "*"
 
+"@types/lodash@^4.17.7":
+  version "4.17.7"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.17.7.tgz#2f776bcb53adc9e13b2c0dfd493dfcbd7de43612"
+  integrity sha512-8wTvZawATi/lsmNu10/j2hk1KEP0IvjubqPE3cu1Xz7xfXXt5oCq3SNUz4fMIP4XGF9Ky+Ue2tBA3hcS7LSBlA==
+
 "@types/node-forge@^1.3.0":
   version "1.3.11"
   resolved "https://registry.npmjs.org/@types/node-forge/-/node-forge-1.3.11.tgz"
@@ -2149,9 +2154,11 @@ atob@^2.1.2:
     "@ant-design/icons-react-native" "^2.3.2"
     "@ant-design/react-native" "^5.2.2"
     "@reduxjs/toolkit" "^2.2.7"
-    automap "file:../../../../AppData/Local/Yarn/Cache/v6/npm-automap-1.0.0-64602e35-7fc7-4852-891b-6463ae505303-1723747485640/node_modules/automap"
+    automap "file:../../../../AppData/Local/Yarn/Cache/v6/npm-automap-1.0.0-4b7cc12a-8f65-4705-a94f-898f0dbf2073-1723827855931/node_modules/automap"
     expo "~51.0.26"
+    expo-location "~17.0.1"
     expo-status-bar "~1.12.1"
+    lodash "^4.17.21"
     react "18.2.0"
     react-dom "^18.3.1"
     react-native "0.74.5"

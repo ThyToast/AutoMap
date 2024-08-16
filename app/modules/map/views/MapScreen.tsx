@@ -2,9 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   GooglePlaceData,
   GooglePlaceDetail,
-  GooglePlacesAutocomplete,
 } from "react-native-google-places-autocomplete";
-import { MAP_API_KEY } from "../constants/mapConstants";
 import { Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
 import {
   BACKGROUND_COLOR,
@@ -13,6 +11,7 @@ import {
 import MapView from "react-native-maps";
 import * as ExpoLocation from "expo-location";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import MapSearch from "../components/MapSearch";
 
 const MapScreen = () => {
   const mapRef = useRef<MapView | null>(null);
@@ -70,24 +69,8 @@ const MapScreen = () => {
         </TouchableOpacity>
       </MapView>
 
-      <View
-        style={{
-          position: "absolute",
-          width: "100%",
-          alignSelf: "center",
-          top: 16,
-        }}
-      >
-        <GooglePlacesAutocomplete
-          placeholder="Search"
-          fetchDetails={true}
-          query={{
-            key: MAP_API_KEY,
-            language: "en",
-          }}
-          onPress={onMapPress}
-          onFail={(error) => console.error(error)}
-        />
+      <View style={styles.autocomplete}>
+        <MapSearch />
       </View>
     </View>
   );
@@ -114,6 +97,12 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 16,
     right: 16,
+  },
+  autocomplete: {
+    position: "absolute",
+    width: "100%",
+    alignSelf: "center",
+    top: 16,
   },
 });
 
