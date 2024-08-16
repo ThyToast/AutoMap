@@ -11,7 +11,7 @@ export const autoCompleteApi = createApi({
     getLocation: builder.query<map.AutocompleteResponse, string>({
       query: (input) => `/autocomplete/json?input=${input}&key=${MAP_API_KEY}`,
     }),
-    getDetailedLocation: builder.query({
+    getDetailedLocation: builder.query<map.LocationDetailedResponse, string>({
       query: (placeId) =>
         `/details/json?place_id=${placeId}&key=${MAP_API_KEY}`,
     }),

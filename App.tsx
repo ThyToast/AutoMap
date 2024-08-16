@@ -7,14 +7,17 @@ import MapScreen from "./app/modules/map/views/MapScreen";
 import { SafeAreaView } from "react-native";
 import { StyleSheet } from "react-native";
 import { MAIN_APP_THEME } from "./app/modules/main/constants/themeConstants";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const App = () => {
   return (
     <Provider store={store}>
       <ThemeProvider theme={MAIN_APP_THEME}>
-        <SafeAreaView style={styles.container}>
-          <MapScreen />
-        </SafeAreaView>
+        <GestureHandlerRootView>
+          <SafeAreaView style={styles.container}>
+            <MapScreen />
+          </SafeAreaView>
+        </GestureHandlerRootView>
       </ThemeProvider>
     </Provider>
   );

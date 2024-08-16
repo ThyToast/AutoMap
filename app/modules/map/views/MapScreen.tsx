@@ -1,9 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import {
-  GooglePlaceData,
-  GooglePlaceDetail,
-} from "react-native-google-places-autocomplete";
-import { Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import {
   BACKGROUND_COLOR,
   MAIN_APP_THEME,
@@ -15,8 +11,6 @@ import MapSearch from "../components/MapSearch";
 
 const MapScreen = () => {
   const mapRef = useRef<MapView | null>(null);
-  const { width, height } = Dimensions.get("window");
-  const ASPECT_RATIO = width / height;
   const [location, setLocation] = useState<null | ExpoLocation.LocationObject>(
     null
   );
@@ -44,23 +38,6 @@ const MapScreen = () => {
     }
   };
 
-  const onMapPress = (
-    _data: GooglePlaceData,
-    detail: GooglePlaceDetail | null
-  ) => {
-    if (detail) {
-      const latitudeDelta =
-        detail.geometry.viewport.northeast.lat -
-        detail.geometry.viewport.southwest.lat;
-      mapRef.current?.animateToRegion({
-        latitude: detail.geometry.location.lat,
-        longitude: detail.geometry.location.lng,
-        latitudeDelta,
-        longitudeDelta: latitudeDelta * ASPECT_RATIO,
-      });
-    }
-  };
-
   return (
     <View style={styles.container}>
       <MapView style={styles.map} ref={mapRef} showsUserLocation={true}>
@@ -70,7 +47,7 @@ const MapScreen = () => {
       </MapView>
 
       <View style={styles.autocomplete}>
-        <MapSearch />
+        <MapSearch mapRef={mapRef} />
       </View>
     </View>
   );
