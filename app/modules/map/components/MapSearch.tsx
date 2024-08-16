@@ -22,6 +22,7 @@ const MapSearch = (props: MapSearchProps) => {
   const { data: locationData } = locationResult ?? {};
   const { predictions = [] } = locationData ?? {};
   const [hideSearch, setHideSearch] = useState(false);
+  const [text, setText] = useState("");
 
   const [
     detailedLocationTrigger,
@@ -46,29 +47,36 @@ const MapSearch = (props: MapSearchProps) => {
     }
   }, [geometry]);
 
-  const onChangeText = useCallback((text: string) => {
+  const triggerSearch = useCallback((text: string) => {
     if (text.length > 3) {
       locationTrigger(text);
     }
   }, []);
 
   // debounce of 500 ms to prevent excessive API calls
-  const onChangeTextDebounced = debounce(onChangeText, 500);
+  const triggerSearchDebounced = debounce(triggerSearch, 500);
+
+  const onTextChanged = useCallback((text: string) => {
+    setText(text);
+    triggerSearchDebounced(text);
+  }, []);
 
   const renderSeperator = () => <View style={styles.seperator} />;
 
-  const onPress = useCallback((placeId: string) => {
-    detailedLocationTrigger(placeId);
+  const onPress = useCallback((item: map.AutocompletePredictions) => {
+    detailedLocationTrigger(item.place_id);
+    setText(item.description);
+    setHideSearch(true);
   }, []);
 
   const renderItem = (item: map.AutocompletePredictions, index: number) => {
     return (
       <Fragment key={index}>
-        {index === 0 && renderSeperator()}
         <TouchableOpacity
           style={styles.item}
-          onPress={() => onPress(item.place_id)}
-          activeOpacity={0.5}
+          onPress={() => {
+            onPress(item);
+          }}
         >
           <Text>{item.description}</Text>
         </TouchableOpacity>
@@ -78,7 +86,13 @@ const MapSearch = (props: MapSearchProps) => {
   };
 
   const renderList = () => {
-    return !hideSearch && <View>{predictions.map(renderItem)}</View>;
+    return (
+      !hideSearch && (
+        <View style={styles.searchContainer}>
+          {predictions.map(renderItem)}
+        </View>
+      )
+    );
   };
 
   return (
@@ -86,7 +100,8 @@ const MapSearch = (props: MapSearchProps) => {
       <Input
         style={styles.input}
         placeholder="Search address"
-        onChangeText={onChangeTextDebounced}
+        onChangeText={onTextChanged}
+        value={text}
         onFocus={() => {
           setHideSearch(false);
         }}
@@ -94,6 +109,8 @@ const MapSearch = (props: MapSearchProps) => {
           setHideSearch(true);
         }}
       />
+      {renderSeperator()}
+
       {renderList()}
     </View>
   );
@@ -105,10 +122,18 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     height: 50,
     padding: 10,
+    borderTopStartRadius: 16,
+    borderTopEndRadius: 16,
   },
   item: {
     backgroundColor: "#FFFF",
     padding: 10,
+    paddingVertical: 20,
+  },
+  searchContainer: {
+    borderEndStartRadius: 16,
+    borderEndEndRadius: 16,
+    backgroundColor: "white",
   },
 });
 
