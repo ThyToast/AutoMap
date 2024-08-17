@@ -4,11 +4,13 @@ import {
   useLazyGetDetailedLocationQuery,
   useLazyGetLocationQuery,
 } from "../src/api/mapApi";
-import { View, Text, StyleSheet, Dimensions } from "react-native";
+import { View, Text, StyleSheet, Dimensions, Keyboard } from "react-native";
 import { debounce } from "lodash";
 import { map } from "../typings";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import MapView from "react-native-maps";
+import { useAppDispatch, useAppSelector } from "../../main/src/hooks";
+import { addSelectedMap } from "../src/redux/mapSlice";
 
 interface MapSearchProps {
   mapRef: React.MutableRefObject<MapView | null>;
@@ -16,11 +18,15 @@ interface MapSearchProps {
 
 const MapSearch = (props: MapSearchProps) => {
   const { mapRef } = props;
-  const [locationTrigger, locationResult] = useLazyGetLocationQuery();
   const { width, height } = Dimensions.get("window");
   const ASPECT_RATIO = width / height;
+  const dispatch = useAppDispatch();
+  const mapSearchedList = useAppSelector((state) => state.map.searchedList);
+
+  const [locationTrigger, locationResult] = useLazyGetLocationQuery();
   const { data: locationData } = locationResult ?? {};
   const { predictions = [] } = locationData ?? {};
+
   const [hideSearch, setHideSearch] = useState(false);
   const [text, setText] = useState("");
 
@@ -66,8 +72,12 @@ const MapSearch = (props: MapSearchProps) => {
   const onPress = useCallback((item: map.AutocompletePredictions) => {
     detailedLocationTrigger(item.place_id);
     setText(item.description);
+    dispatch(addSelectedMap(item));
     setHideSearch(true);
+    Keyboard.dismiss();
   }, []);
+
+  console.log(mapSearchedList);
 
   const renderItem = (item: map.AutocompletePredictions, index: number) => {
     return (
@@ -80,7 +90,6 @@ const MapSearch = (props: MapSearchProps) => {
         >
           <Text>{item.description}</Text>
         </TouchableOpacity>
-        {index !== predictions.length - 1 && renderSeperator()}
       </Fragment>
     );
   };
@@ -88,9 +97,22 @@ const MapSearch = (props: MapSearchProps) => {
   const renderList = () => {
     return (
       !hideSearch && (
-        <View style={styles.searchContainer}>
-          {predictions.map(renderItem)}
-        </View>
+        <>
+          {mapSearchedList.length > 0 && (
+            <View style={styles.recentSearch}>
+              <Text style={{ padding: 10, color: "#8a8a8a" }}>
+                Recent search
+              </Text>
+              <View>{mapSearchedList.map(renderItem)}</View>
+            </View>
+          )}
+
+          {predictions.length > 0 && (
+            <View style={styles.searchContainer}>
+              {predictions.map(renderItem)}
+            </View>
+          )}
+        </>
       )
     );
   };
@@ -108,6 +130,7 @@ const MapSearch = (props: MapSearchProps) => {
         onBlur={() => {
           setHideSearch(true);
         }}
+        clearButtonMode={"while-editing"}
       />
       {renderSeperator()}
 
@@ -126,7 +149,6 @@ const styles = StyleSheet.create({
     borderTopEndRadius: 16,
   },
   item: {
-    backgroundColor: "#FFFF",
     padding: 10,
     paddingVertical: 20,
   },
@@ -134,6 +156,11 @@ const styles = StyleSheet.create({
     borderEndStartRadius: 16,
     borderEndEndRadius: 16,
     backgroundColor: "white",
+    paddingHorizontal: 6,
+  },
+  recentSearch: {
+    backgroundColor: "#e3e3e3",
+    paddingHorizontal: 6,
   },
 });
 
