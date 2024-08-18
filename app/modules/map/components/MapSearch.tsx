@@ -1,4 +1,4 @@
-import { Input } from "@ant-design/react-native";
+import { Input, SwipeAction } from "@ant-design/react-native";
 import React, { Fragment, useCallback, useEffect, useState } from "react";
 import {
   useLazyGetDetailedLocationQuery,
@@ -11,15 +11,15 @@ import {
   Dimensions,
   Keyboard,
   ScrollView,
+  Animated,
 } from "react-native";
 import { debounce } from "lodash";
 import { map } from "../typings";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { Swipeable, TouchableOpacity } from "react-native-gesture-handler";
 import MapView from "react-native-maps";
 import { useAppDispatch, useAppSelector } from "../../main/src/hooks";
-import { addSelectedMap } from "../src/redux/mapSlice";
+import { addSelectedMap, clearSelectedMap } from "../src/redux/mapSlice";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { MAIN_APP_THEME } from "../../main/constants/themeConstants";
 
 interface MapSearchProps {
   mapRef: React.MutableRefObject<MapView | null>;
@@ -83,7 +83,7 @@ const MapSearch = (props: MapSearchProps) => {
 
   const renderSeperator = () => <View style={styles.seperator} />;
 
-  const onPress = useCallback((item: map.AutocompletePredictions) => {
+  const addMap = useCallback((item: map.AutocompletePredictions) => {
     detailedLocationTrigger(item.place_id);
     setText(item.description);
     dispatch(
@@ -97,6 +97,12 @@ const MapSearch = (props: MapSearchProps) => {
     Keyboard.dismiss();
   }, []);
 
+  const removeMap = useCallback((id: string) => {
+    dispatch(clearSelectedMap(id));
+  }, []);
+
+  console.log(mapSearchedList);
+
   const renderItem = (item: map.AutocompletePredictions, index: number) => {
     const icon = item.isStored ? "clockcircleo" : "search1";
     return (
@@ -104,15 +110,31 @@ const MapSearch = (props: MapSearchProps) => {
         <TouchableOpacity
           style={styles.item}
           onPress={() => {
-            onPress(item);
+            addMap(item);
           }}
         >
           <View
-            style={{ backgroundColor: "white", padding: 10, borderRadius: 24 }}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              columnGap: 16,
+              flex: 1,
+            }}
           >
-            <AntDesign name={icon} size={16} color={"black"} />
+            <View style={styles.icon}>
+              <AntDesign name={icon} size={16} color={"black"} />
+            </View>
+            <Text style={styles.description}>{item.description}</Text>
           </View>
-          <Text style={{ marginEnd: 48 }}>{item.description}</Text>
+          {item.isStored && (
+            <TouchableOpacity
+              hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+              style={{ flex: 1, justifyContent: "center" }}
+              onPress={() => removeMap(item.place_id)}
+            >
+              <AntDesign name={"closecircle"} size={16} color="#b3b3b3" />
+            </TouchableOpacity>
+          )}
         </TouchableOpacity>
       </Fragment>
     );
@@ -143,7 +165,7 @@ const MapSearch = (props: MapSearchProps) => {
     <View>
       <Input
         style={styles.input}
-        placeholder="Search address"
+        placeholder={"Search address"}
         onChangeText={onTextChanged}
         value={text}
         onFocus={() => {
@@ -184,6 +206,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
   },
   recentSearchText: { padding: 10, color: "#8a8a8a" },
+  icon: {
+    backgroundColor: "white",
+    padding: 10,
+    borderRadius: 24,
+    aspectRatio: 1,
+  },
+  description: { flex: 1 },
 });
 
 export default MapSearch;

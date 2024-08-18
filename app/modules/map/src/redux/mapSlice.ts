@@ -27,14 +27,15 @@ export const mapSlice = createSlice({
       }
     },
     clearSelectedMap: (state, action: PayloadAction<string>) => {
-      state.searchedList.filter((value) => value.place_id !== action.payload);
-    },
-    clearAllSelectedMaps: (state) => {
-      state.searchedList = [];
+      return {
+        ...state,
+        searchedList: [...state.searchedList].filter(
+          (value) => value.place_id !== action.payload
+        ),
+      };
     },
   },
 });
 
-export const { addSelectedMap, clearSelectedMap, clearAllSelectedMaps } =
-  mapSlice.actions;
+export const { addSelectedMap, clearSelectedMap } = mapSlice.actions;
 export default mapSlice;
