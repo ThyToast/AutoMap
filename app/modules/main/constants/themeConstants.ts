@@ -7,3 +7,5 @@ export const MAIN_APP_THEME: Partial<Theme> = {
 };
 
 export const BACKGROUND_COLOR = "#ECF0F1";
+export const BACKGROUND_SECONDARY = "#E3E3E3";
+export const BACKGROUND_WHITE = "#FFFFFF";

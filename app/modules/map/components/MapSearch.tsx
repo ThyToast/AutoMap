@@ -1,4 +1,4 @@
-import { Input, SwipeAction } from "@ant-design/react-native";
+import { Input } from "@ant-design/react-native";
 import React, { Fragment, useCallback, useEffect, useState } from "react";
 import {
   useLazyGetDetailedLocationQuery,
@@ -11,15 +11,18 @@ import {
   Dimensions,
   Keyboard,
   ScrollView,
-  Animated,
 } from "react-native";
 import { debounce } from "lodash";
 import { map } from "../typings";
-import { Swipeable, TouchableOpacity } from "react-native-gesture-handler";
+import { TouchableOpacity } from "react-native-gesture-handler";
 import MapView from "react-native-maps";
 import { useAppDispatch, useAppSelector } from "../../main/src/hooks";
 import { addSelectedMap, clearSelectedMap } from "../src/redux/mapSlice";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import {
+  BACKGROUND_SECONDARY,
+  BACKGROUND_WHITE,
+} from "../../main/constants/themeConstants";
 
 interface MapSearchProps {
   mapRef: React.MutableRefObject<MapView | null>;
@@ -29,6 +32,9 @@ const MapSearch = (props: MapSearchProps) => {
   const { mapRef } = props;
   const { width, height } = Dimensions.get("window");
   const ASPECT_RATIO = width / height;
+  const HITSLOP_CONFIG = { top: 20, bottom: 20, left: 20, right: 20 };
+  const SEARCHABLE_LENGTH = 3;
+
   const dispatch = useAppDispatch();
   const mapSearchedList = useAppSelector((state) => state.map.searchedList);
 
@@ -63,7 +69,7 @@ const MapSearch = (props: MapSearchProps) => {
   }, [geometry]);
 
   const triggerSearch = useCallback((text: string) => {
-    if (text.length > 3) {
+    if (text.length > SEARCHABLE_LENGTH) {
       locationTrigger(text);
     }
   }, []);
@@ -101,8 +107,6 @@ const MapSearch = (props: MapSearchProps) => {
     dispatch(clearSelectedMap(id));
   }, []);
 
-  console.log(mapSearchedList);
-
   const renderItem = (item: map.AutocompletePredictions, index: number) => {
     const icon = item.isStored ? "clockcircleo" : "search1";
     return (
@@ -113,14 +117,7 @@ const MapSearch = (props: MapSearchProps) => {
             addMap(item);
           }}
         >
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              columnGap: 16,
-              flex: 1,
-            }}
-          >
+          <View style={styles.itemContent}>
             <View style={styles.icon}>
               <AntDesign name={icon} size={16} color={"black"} />
             </View>
@@ -128,8 +125,8 @@ const MapSearch = (props: MapSearchProps) => {
           </View>
           {item.isStored && (
             <TouchableOpacity
-              hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
-              style={{ flex: 1, justifyContent: "center" }}
+              hitSlop={HITSLOP_CONFIG}
+              style={styles.closeButton}
               onPress={() => removeMap(item.place_id)}
             >
               <AntDesign name={"closecircle"} size={16} color="#b3b3b3" />
@@ -183,7 +180,7 @@ const MapSearch = (props: MapSearchProps) => {
 const styles = StyleSheet.create({
   seperator: { backgroundColor: "black", flex: 1, height: 1 },
   input: {
-    backgroundColor: "white",
+    backgroundColor: BACKGROUND_WHITE,
     height: 50,
     padding: 10,
     borderTopStartRadius: 16,
@@ -195,19 +192,26 @@ const styles = StyleSheet.create({
     columnGap: 10,
     alignItems: "center",
   },
+  itemContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    columnGap: 16,
+    flex: 1,
+  },
+  closeButton: { flex: 1, justifyContent: "center" },
   searchContainer: {
     borderEndStartRadius: 16,
     borderEndEndRadius: 16,
-    backgroundColor: "#e3e3e3",
+    backgroundColor: BACKGROUND_SECONDARY,
     paddingHorizontal: 6,
   },
   recentSearch: {
-    backgroundColor: "#e3e3e3",
+    backgroundColor: BACKGROUND_SECONDARY,
     paddingHorizontal: 6,
   },
   recentSearchText: { padding: 10, color: "#8a8a8a" },
   icon: {
-    backgroundColor: "white",
+    backgroundColor: BACKGROUND_WHITE,
     padding: 10,
     borderRadius: 24,
     aspectRatio: 1,
