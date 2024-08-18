@@ -4,13 +4,22 @@ import {
   useLazyGetDetailedLocationQuery,
   useLazyGetLocationQuery,
 } from "../src/api/mapApi";
-import { View, Text, StyleSheet, Dimensions, Keyboard } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Dimensions,
+  Keyboard,
+  ScrollView,
+} from "react-native";
 import { debounce } from "lodash";
 import { map } from "../typings";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import MapView from "react-native-maps";
 import { useAppDispatch, useAppSelector } from "../../main/src/hooks";
 import { addSelectedMap } from "../src/redux/mapSlice";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import { MAIN_APP_THEME } from "../../main/constants/themeConstants";
 
 interface MapSearchProps {
   mapRef: React.MutableRefObject<MapView | null>;
@@ -63,6 +72,11 @@ const MapSearch = (props: MapSearchProps) => {
   const triggerSearchDebounced = debounce(triggerSearch, 500);
 
   const onTextChanged = useCallback((text: string) => {
+    if (text.length === 0) {
+      setHideSearch(true);
+    } else {
+      setHideSearch(false);
+    }
     setText(text);
     triggerSearchDebounced(text);
   }, []);
@@ -72,14 +86,19 @@ const MapSearch = (props: MapSearchProps) => {
   const onPress = useCallback((item: map.AutocompletePredictions) => {
     detailedLocationTrigger(item.place_id);
     setText(item.description);
-    dispatch(addSelectedMap(item));
+    dispatch(
+      addSelectedMap({
+        place_id: item.place_id,
+        description: item.description,
+        isStored: true,
+      })
+    );
     setHideSearch(true);
     Keyboard.dismiss();
   }, []);
 
-  console.log(mapSearchedList);
-
   const renderItem = (item: map.AutocompletePredictions, index: number) => {
+    const icon = item.isStored ? "clockcircleo" : "search1";
     return (
       <Fragment key={index}>
         <TouchableOpacity
@@ -88,7 +107,12 @@ const MapSearch = (props: MapSearchProps) => {
             onPress(item);
           }}
         >
-          <Text>{item.description}</Text>
+          <View
+            style={{ backgroundColor: "white", padding: 10, borderRadius: 24 }}
+          >
+            <AntDesign name={icon} size={16} color={"black"} />
+          </View>
+          <Text style={{ marginEnd: 48 }}>{item.description}</Text>
         </TouchableOpacity>
       </Fragment>
     );
@@ -97,12 +121,10 @@ const MapSearch = (props: MapSearchProps) => {
   const renderList = () => {
     return (
       !hideSearch && (
-        <>
+        <ScrollView overScrollMode={"never"} alwaysBounceVertical={false}>
           {mapSearchedList.length > 0 && (
             <View style={styles.recentSearch}>
-              <Text style={{ padding: 10, color: "#8a8a8a" }}>
-                Recent search
-              </Text>
+              <Text style={styles.recentSearchText}>Recent</Text>
               <View>{mapSearchedList.map(renderItem)}</View>
             </View>
           )}
@@ -112,7 +134,7 @@ const MapSearch = (props: MapSearchProps) => {
               {predictions.map(renderItem)}
             </View>
           )}
-        </>
+        </ScrollView>
       )
     );
   };
@@ -126,9 +148,6 @@ const MapSearch = (props: MapSearchProps) => {
         value={text}
         onFocus={() => {
           setHideSearch(false);
-        }}
-        onBlur={() => {
-          setHideSearch(true);
         }}
         clearButtonMode={"while-editing"}
       />
@@ -150,18 +169,21 @@ const styles = StyleSheet.create({
   },
   item: {
     padding: 10,
-    paddingVertical: 20,
+    flexDirection: "row",
+    columnGap: 10,
+    alignItems: "center",
   },
   searchContainer: {
     borderEndStartRadius: 16,
     borderEndEndRadius: 16,
-    backgroundColor: "white",
+    backgroundColor: "#e3e3e3",
     paddingHorizontal: 6,
   },
   recentSearch: {
     backgroundColor: "#e3e3e3",
     paddingHorizontal: 6,
   },
+  recentSearchText: { padding: 10, color: "#8a8a8a" },
 });
 
 export default MapSearch;

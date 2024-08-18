@@ -6,6 +6,7 @@ export module map {
   interface AutocompletePredictions {
     description: string;
     place_id: string;
+    isStored?: boolean;
   }
 
   interface LocationDetailedResponse {

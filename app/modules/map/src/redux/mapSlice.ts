@@ -18,7 +18,7 @@ export const mapSlice = createSlice({
       action: PayloadAction<map.AutocompletePredictions>
     ) => {
       const searchedList = state.searchedList;
-      const isPresent = searchedList.some(function (list) {
+      const isPresent = searchedList.some((list) => {
         return list.place_id === action.payload.place_id;
       });
 
