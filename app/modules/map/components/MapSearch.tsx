@@ -4,18 +4,10 @@ import {
   useLazyGetDetailedLocationQuery,
   useLazyGetLocationQuery,
 } from "../src/api/mapApi";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Dimensions,
-  Keyboard,
-  ScrollView,
-} from "react-native";
+import { View, Text, StyleSheet, Keyboard, ScrollView } from "react-native";
 import { debounce } from "lodash";
 import { map } from "../typings";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import MapView from "react-native-maps";
 import { useAppDispatch, useAppSelector } from "../../main/src/hooks";
 import {
   addSelectedMap,
@@ -28,14 +20,7 @@ import {
   BACKGROUND_WHITE,
 } from "../../main/constants/themeConstants";
 
-interface MapSearchProps {
-  mapRef: React.MutableRefObject<MapView | null>;
-}
-
-const MapSearch = (props: MapSearchProps) => {
-  const { mapRef } = props;
-  const { width, height } = Dimensions.get("window");
-  const ASPECT_RATIO = width / height;
+const MapSearch = () => {
   const HITSLOP_CONFIG = { top: 20, bottom: 20, left: 20, right: 20 };
   const SEARCHABLE_LENGTH = 3;
 
@@ -59,17 +44,7 @@ const MapSearch = (props: MapSearchProps) => {
 
   useEffect(() => {
     // Sets map location based on user selection
-
-    if (mapRef.current && geometry) {
-      const latitudeDelta =
-        geometry.viewport.northeast.lat - geometry.viewport.southwest.lat;
-      mapRef.current?.animateToRegion({
-        latitude: geometry.location.lat,
-        longitude: geometry.location.lng,
-        latitudeDelta,
-        longitudeDelta: latitudeDelta * ASPECT_RATIO,
-      });
-
+    if (geometry) {
       dispatch(
         updateSelectedLocation({
           latitude: geometry.location.lat,

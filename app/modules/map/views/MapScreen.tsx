@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import {
   BACKGROUND_COLOR,
@@ -17,6 +17,17 @@ const MapScreen = () => {
   );
 
   const { location: currentLocation } = useGetCurrentLocation();
+
+  useEffect(() => {
+    if (selectedLocation) {
+      mapRef.current?.animateToRegion({
+        latitude: selectedLocation.latitude,
+        longitude: selectedLocation.longitude,
+        latitudeDelta: 0.0043,
+        longitudeDelta: 0.0034,
+      });
+    }
+  }, [selectedLocation]);
 
   const onLocationPress = () => {
     if (currentLocation) {
@@ -46,7 +57,7 @@ const MapScreen = () => {
       </MapView>
 
       <View style={styles.autocomplete}>
-        <MapSearch mapRef={mapRef} />
+        <MapSearch />
       </View>
     </View>
   );
