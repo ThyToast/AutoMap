@@ -1,22 +1,19 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { MAP_API_KEY } from "../../constants/mapConstants";
-import { map } from "../../typings";
 
-export const autoCompleteApi = createApi({
-  reducerPath: "autoCompleteApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: "https://maps.googleapis.com/maps/api/place",
-  }),
-  endpoints: (builder) => ({
-    getLocation: builder.query<map.AutocompleteResponse, string>({
-      query: (input) => `/autocomplete/json?input=${input}&key=${MAP_API_KEY}`,
-    }),
-    getDetailedLocation: builder.query<map.LocationDetailedResponse, string>({
-      query: (placeId) =>
-        `/details/json?place_id=${placeId}&key=${MAP_API_KEY}`,
-    }),
-  }),
-});
+const BASE_URL = "https://maps.googleapis.com/maps/api/place";
 
-export const { useLazyGetLocationQuery, useLazyGetDetailedLocationQuery } =
-  autoCompleteApi;
+export const getLocation = async (input: string) => {
+  const response = await fetch(
+    `${BASE_URL}/autocomplete/json?input=${input}&key=${MAP_API_KEY}`
+  );
+
+  return response;
+};
+
+export const getDetailedLocation = async (placeId: string) => {
+  const response = await fetch(
+    `${BASE_URL}/details/json?place_id=${placeId}&key=${MAP_API_KEY}`
+  );
+
+  return response;
+};

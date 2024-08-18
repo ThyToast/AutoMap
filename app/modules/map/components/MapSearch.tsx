@@ -1,9 +1,5 @@
 import { Input } from "@ant-design/react-native";
 import React, { Fragment, useCallback, useEffect, useState } from "react";
-import {
-  useLazyGetDetailedLocationQuery,
-  useLazyGetLocationQuery,
-} from "../src/api/mapApi";
 import { View, Text, StyleSheet, Keyboard, ScrollView } from "react-native";
 import { debounce } from "lodash";
 import { map } from "../typings";
@@ -19,6 +15,8 @@ import {
   BACKGROUND_SECONDARY,
   BACKGROUND_WHITE,
 } from "../../main/constants/themeConstants";
+import { mapAutocomplete } from "../src/redux/mapAutocompleteSlice";
+import { mapAutocompleteDetailed } from "../src/redux/mapAutocompleteDetailSlice";
 
 const MapSearch = () => {
   const HITSLOP_CONFIG = { top: 20, bottom: 20, left: 20, right: 20 };
@@ -26,18 +24,16 @@ const MapSearch = () => {
 
   const dispatch = useAppDispatch();
   const mapSearchedList = useAppSelector((state) => state.map.searchedList);
+  const locationResult = useAppSelector((state) => state.autoComplete);
+  const detailedLocationResult = useAppSelector(
+    (state) => state.autoCompleteDetailed
+  );
 
-  const [locationTrigger, locationResult] = useLazyGetLocationQuery();
   const { data: locationData } = locationResult ?? {};
   const { predictions = [] } = locationData ?? {};
 
   const [hideSearch, setHideSearch] = useState(false);
   const [text, setText] = useState("");
-
-  const [
-    detailedLocationTrigger,
-    detailedLocationResult,
-  ] = useLazyGetDetailedLocationQuery();
 
   const { data: detailedLocationData } = detailedLocationResult ?? {};
   const { geometry } = detailedLocationData?.result ?? {};
@@ -56,7 +52,11 @@ const MapSearch = () => {
 
   const triggerSearch = useCallback((text: string) => {
     if (text.length > SEARCHABLE_LENGTH) {
-      locationTrigger(text);
+      dispatch(
+        mapAutocomplete({
+          input: text,
+        })
+      );
     }
   }, []);
 
@@ -76,7 +76,11 @@ const MapSearch = () => {
   const renderSeperator = () => <View style={styles.seperator} />;
 
   const addMap = useCallback((item: map.AutocompletePredictions) => {
-    detailedLocationTrigger(item.place_id);
+    dispatch(
+      mapAutocompleteDetailed({
+        placeId: item.place_id,
+      })
+    );
     setText(item.description);
     dispatch(
       addSelectedMap({
