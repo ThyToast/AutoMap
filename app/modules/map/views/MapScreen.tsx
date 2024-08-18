@@ -1,37 +1,28 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import {
   BACKGROUND_COLOR,
   MAIN_APP_THEME,
 } from "../../main/constants/themeConstants";
-import MapView from "react-native-maps";
-import * as ExpoLocation from "expo-location";
+import MapView, { Marker } from "react-native-maps";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import MapSearch from "../components/MapSearch";
+import { useAppSelector } from "../../main/src/hooks";
+import useGetCurrentLocation from "../src/hooks/useGetCurrentLocation";
 
 const MapScreen = () => {
   const mapRef = useRef<MapView | null>(null);
-  const [location, setLocation] = useState<null | ExpoLocation.LocationObject>(
-    null
+  const selectedLocation = useAppSelector(
+    (state) => state.map.selectedLocation
   );
 
-  useEffect(() => {
-    (async () => {
-      let { status } = await ExpoLocation.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        return;
-      }
-
-      let location = await ExpoLocation.getCurrentPositionAsync({});
-      setLocation(location);
-    })();
-  }, []);
+  const { location: currentLocation } = useGetCurrentLocation();
 
   const onLocationPress = () => {
-    if (location) {
+    if (currentLocation) {
       mapRef.current?.animateToRegion({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
+        latitude: currentLocation.coords.latitude,
+        longitude: currentLocation.coords.longitude,
         latitudeDelta: 0.0043,
         longitudeDelta: 0.0034,
       });
@@ -41,6 +32,14 @@ const MapScreen = () => {
   return (
     <View style={styles.container}>
       <MapView style={styles.map} ref={mapRef} showsUserLocation={true}>
+        {selectedLocation && (
+          <Marker
+            coordinate={{
+              latitude: selectedLocation?.latitude,
+              longitude: selectedLocation?.longitude,
+            }}
+          />
+        )}
         <TouchableOpacity style={styles.button} onPress={onLocationPress}>
           <AntDesign name="enviroment" size={24} color="black" />
         </TouchableOpacity>

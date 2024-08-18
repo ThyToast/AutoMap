@@ -17,7 +17,11 @@ import { map } from "../typings";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import MapView from "react-native-maps";
 import { useAppDispatch, useAppSelector } from "../../main/src/hooks";
-import { addSelectedMap, clearSelectedMap } from "../src/redux/mapSlice";
+import {
+  addSelectedMap,
+  clearSelectedMap,
+  updateSelectedLocation,
+} from "../src/redux/mapSlice";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import {
   BACKGROUND_SECONDARY,
@@ -65,6 +69,13 @@ const MapSearch = (props: MapSearchProps) => {
         latitudeDelta,
         longitudeDelta: latitudeDelta * ASPECT_RATIO,
       });
+
+      dispatch(
+        updateSelectedLocation({
+          latitude: geometry.location.lat,
+          longitude: geometry.location.lng,
+        })
+      );
     }
   }, [geometry]);
 

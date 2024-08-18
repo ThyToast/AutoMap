@@ -1,12 +1,15 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { map } from "../../typings";
+import { LatLng } from "react-native-maps";
 
 export interface mapState {
   searchedList: map.AutocompletePredictions[];
+  selectedLocation: LatLng | null;
 }
 
 const MAP_INITIAL_STATE: mapState = {
   searchedList: [],
+  selectedLocation: null,
 };
 
 export const mapSlice = createSlice({
@@ -34,8 +37,15 @@ export const mapSlice = createSlice({
         ),
       };
     },
+    updateSelectedLocation: (state, action: PayloadAction<LatLng>) => {
+      return {
+        ...state,
+        selectedLocation: action.payload,
+      };
+    },
   },
 });
 
-export const { addSelectedMap, clearSelectedMap } = mapSlice.actions;
+export const { addSelectedMap, clearSelectedMap, updateSelectedLocation } =
+  mapSlice.actions;
 export default mapSlice;
