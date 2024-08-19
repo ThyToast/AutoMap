@@ -11,13 +11,6 @@
 - Redux state management
 - AntDesign UI library
 
-
-**Table of Contents**
-
-[TOCM]
-
-[TOC]
-
 #Installation 
 - Clone git repository
 - Run `npm install` or `yarn`
