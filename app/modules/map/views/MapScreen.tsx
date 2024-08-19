@@ -51,11 +51,16 @@ const MapScreen = () => {
             }}
           />
         )}
-        <TouchableOpacity style={styles.button} onPress={onLocationPress}>
-          <AntDesign name="enviroment" size={24} color="black" />
-        </TouchableOpacity>
       </MapView>
 
+      <TouchableOpacity style={styles.button} onPress={onLocationPress}>
+        <AntDesign
+          name={"enviroment"}
+          size={24}
+          color="black"
+          style={styles.icon}
+        />
+      </TouchableOpacity>
       <View style={styles.autocomplete}>
         <MapSearch />
       </View>
@@ -69,6 +74,7 @@ const styles = StyleSheet.create({
     backgroundColor: BACKGROUND_COLOR,
     padding: 16,
   },
+  icon: { position: "absolute" },
   map: {
     width: "100%",
     flex: 1,
@@ -82,8 +88,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     position: "absolute",
-    bottom: 16,
-    right: 16,
+    bottom: "5%",
+    right: "10%",
   },
   autocomplete: {
     position: "absolute",
