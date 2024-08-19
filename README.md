@@ -11,12 +11,12 @@
 - Redux state management
 - AntDesign UI library
 
-#Installation 
+# Installation 
 - Clone git repository
 - Run `npm install` or `yarn`
 - Obtain Google Autocomplete API keys
 - Run app using `npx expo start` or `yarn start`
 
-#Demonstration
+# Demonstration
 
 https://drive.google.com/file/d/1kdy5ulQN_ob_Crv0DFq5xcq3eGpug7hE/view?usp=sharing
